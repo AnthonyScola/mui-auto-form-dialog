@@ -9,7 +9,6 @@ import {
   TextFieldProps,
   Grid,
   TextField,
-  debounce,
 } from '@mui/material';
 import axios from 'axios';
 
@@ -62,6 +61,7 @@ export default function AutoDialog({
   onClose
 }: AutoDialogProps) {
   const [formData, setFormData] = useState<FormData>({});
+  const [errorsArray, setErrors] = useState<string[]>([]);
   const [readyToSubmit, setReadyToSubmit] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(false);
 
@@ -80,18 +80,8 @@ export default function AutoDialog({
     });
 
     setReadyToSubmit(isInvalidArray.length < 1)
+    setErrors(isInvalidArray);
   };
-
-  const debouncedSetFormData = debounce((fieldId, value) => {
-    setFormData(prevData => ({
-      ...prevData,
-      [fieldId]: value
-    }));
-    checkValidity({
-      ...formData,
-      [fieldId]: value
-    });
-  }, 200);
 
   useEffect(() => {
     if (open) {
@@ -106,11 +96,13 @@ export default function AutoDialog({
         }
       });
       setFormData(newFormData);
+      checkValidity(newFormData);
     }
   }, [open, data.formComponents]);
 
   const handleClose = () => {
     setFormData({});
+    setErrors([]);
     setLoading(false);
     onClose();
   };
@@ -132,6 +124,9 @@ export default function AutoDialog({
     });
   };
 
+  console.log('formData:', formData);
+  console.log('errorsArray.length:', errorsArray.length);
+
   return (
     <Dialog fullWidth open={open} onClose={handleClose}>
       { isLoading ?(
@@ -143,78 +138,85 @@ export default function AutoDialog({
         </>
       ):(
         <>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogContent>
-            {details && (
-              <DialogContentText sx={{ pb: 2.5 }}>{details}</DialogContentText>
-            )}
-            <Grid container spacing={1.5}>
-              {data.formComponents.map((control) => (
-                <Grid
-                  item
-                  xs={control.size.sx}
-                  sm={control.size.sm}
-                  md={control.size.md}
-                  lg={control.size.lg}
-                  xl={control.size.xl}
-                  key={control.controlProps.id}
-                  sx={{ display: `${control.hidden === true && 'none'}` }}
-                >
-                  {control.controlType === 'TextField' && (
-                    <TextField
-                      {...control.controlProps}
-                      onChange={(event) => {
-                        const newValue = event.target.value;
-                        debouncedSetFormData(control.controlProps.id, newValue);
-                      }}
-                      error={
-                        control.controlProps?.required &&
-                        !formData[control.controlProps.id]
-                      }
-                      fullWidth
-                    />
-                  )}
-                </Grid>
-              ))}
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            {(data.action === 'post' || data.action === 'put' || data.action === 'patch') && (
-              <>
-                <Button
-                  onClick={handleClose}
-                  variant='outlined'
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSubmit}
-                  variant='contained'
-                  disabled={!readyToSubmit}
-                >
-                  Submit
-                </Button>
-              </>
-            )}
-            {data.action === 'delete' && (
-              <>
-                <Button
-                  onClick={handleSubmit}
-                  color='error'
-                  variant='outlined'
-                >
-                  Delete
-                </Button>
-                <Button
-                  onClick={handleClose}
-                  variant='contained'
-                >
-                  Cancel
-                </Button>
-              </>
-            )}
-          </DialogActions>
-        </>
+        <DialogTitle>{title}</DialogTitle>
+        <DialogContent>
+          {details && (
+            <DialogContentText sx={{ pb: 2.5 }}>{details}</DialogContentText>
+          )}
+          <Grid container spacing={1.5}>
+            {data.formComponents.map((control) => (
+              <Grid
+                item
+                xs={control.size.sx}
+                sm={control.size.sm}
+                md={control.size.md}
+                lg={control.size.lg}
+                xl={control.size.xl}
+                key={control.controlProps.id}
+                sx={{ display: `${control.hidden === true && 'none'}` }}
+              >
+                {control.controlType === 'TextField' && (
+                  <TextField
+                    {...control.controlProps}
+                    onChange={(event) => {
+                      const newValue = event.target.value;
+                      setFormData((prevData) => ({
+                        ...prevData,
+                        [control.controlProps.id]: newValue,
+                      }));
+                      checkValidity({
+                        ...formData,
+                        [control.controlProps.id]: newValue,
+                      });
+                    }}
+                    error={
+                      control.controlProps?.required &&
+                      !formData[control.controlProps.id]
+                    }
+                    fullWidth
+                  />
+                )}
+              </Grid>
+            ))}
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          {(data.action === 'post' || data.action === 'put' || data.action === 'patch') && (
+            <>
+              <Button
+                onClick={handleClose}
+                variant='outlined'
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                variant='contained'
+                disabled={!readyToSubmit}
+              >
+                Submit
+              </Button>
+            </>
+          )}
+          {data.action === 'delete' && (
+            <>
+              <Button
+                onClick={handleSubmit}
+                color='error'
+                variant='outlined'
+              >
+                Delete
+              </Button>
+              <Button
+                onClick={handleClose}
+                variant='contained'
+              >
+                Cancel
+              </Button>
+            </>
+          )}
+        </DialogActions>
+      </>
       )}
     </Dialog>
   );
