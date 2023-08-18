@@ -30,11 +30,33 @@ export default function App() {
               {
                 controlType: 'TextField',
                 size: {
+                  sx: 6,
+                },
+                controlProps: {
+                  id: 'fName',
+                  label: 'First Name',
+                  required: true,
+                },
+              },
+              {
+                controlType: 'TextField',
+                size: {
+                  sx: 6,
+                },
+                controlProps: {
+                  id: 'lName',
+                  label: 'Last Name',
+                  required: true,
+                },
+              },
+              {
+                controlType: 'TextField',
+                size: {
                   sx: 12,
                 },
                 controlProps: {
-                  id: 'name',
-                  label: 'Event Config Name',
+                  id: 'email',
+                  label: 'e-mail',
                   required: true,
                 },
               },
