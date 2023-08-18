@@ -50,6 +50,20 @@ export default function App() {
                 },
               },
               {
+                controlType: 'Autocomplete',
+                size: {
+                  sx: 4,
+                },
+                controlProps: {
+                  id: 'gender',
+                  label: 'Gender',
+                  required: true,
+                  noOptionsText: "No Genders?",
+                  options: ["male","female","other"]
+                  
+                },
+              },
+              {
                 controlType: 'TextField',
                 size: {
                   sx: 12,

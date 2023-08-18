@@ -7,8 +7,10 @@ import {
   DialogContentText,
   DialogTitle,
   TextFieldProps,
+  //AutocompleteProps,
   Grid,
   TextField,
+  Autocomplete
 } from '@mui/material';
 import axios from 'axios';
 
@@ -33,8 +35,24 @@ interface TextFieldControl {
   };
 }
 
+interface AutocompleteFieldControl {
+  controlType: 'Autocomplete';
+  size: gridSize;
+  hidden?: boolean;
+  controlProps: {
+    id: string;
+    required?: boolean;
+    label?: string;
+    defaultValue?: string;
+    defaultValues?: string[] | {[key: string]: string};
+    noOptionsText: string;
+    options: string[];
+  };
+}
+
 export type Control =
   | TextFieldControl
+  | AutocompleteFieldControl
   ;
 
 export interface AutoDialogProps {
@@ -89,6 +107,11 @@ export default function AutoDialog({
       data.formComponents.forEach((control) => {
         switch (control.controlType) {
           case 'TextField':
+            newFormData[control.controlProps.id] = (
+              control.controlProps.defaultValue ?? ''
+            ).toString();
+            break;
+          case 'Autocomplete':
             newFormData[control.controlProps.id] = (
               control.controlProps.defaultValue ?? ''
             ).toString();
@@ -175,6 +198,32 @@ export default function AutoDialog({
                     }
                     fullWidth
                   />
+                )}
+                {control.controlType === 'Autocomplete' && (
+                  <Autocomplete
+                  sx={{ mt: 1 }}
+                  {...control.controlProps}
+                  options={control.controlProps.options}
+                  onChange={(event, value) =>
+                    setFormData((data) => ({
+                      ...data,
+                      [control.controlProps.id]: value ?? '',
+                    }))
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      required={control.controlProps?.required}
+                      label={control.controlProps.label}
+                      variant="outlined"
+                      error={
+                        control.controlProps?.required &&
+                        !formData[control.controlProps.id]
+                      }
+                      fullWidth
+                    />
+                  )}
+                />
                 )}
               </Grid>
             ))}
