@@ -87,7 +87,7 @@ export default function AutoDialog({
       ...prevData,
       [fieldId]: value
     }));
-    checkForErrors({
+    checkValidity({
       ...formData,
       [fieldId]: value
     });
