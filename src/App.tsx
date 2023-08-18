@@ -13,21 +13,36 @@ export default function App() {
   return (
     <Grid
       container
-      direction="row"
-      justifyContent="center"
-      alignItems="center"
+      direction='row'
+      justifyContent='center'
+      alignItems='center'
       sx={{height: '100vh'}}
     >
-      <AutoDialog
-        open={showAutoDialog} 
-        title={'Auto Dialog'} 
-        details={'This Dialog should help you develope faster!!'}
-        data={{
-          action: 'add',
-          query: ''
-        }}
-        onClose={()=>setShowAutoDialog(false)}
-      />
+      {showAutoDialog && (
+        <AutoDialog
+          open={showAutoDialog} 
+          title={'Auto Dialog'} 
+          details={'This Dialog should help you develope faster!!'}
+          data={{
+            action: 'post',
+            query: '',
+            formComponents: [
+              {
+                controlType: 'TextField',
+                size: {
+                  sx: 12,
+                },
+                controlProps: {
+                  id: 'name',
+                  label: 'Event Config Name',
+                  required: true,
+                },
+              },
+            ]
+          }}
+          onClose={()=>setShowAutoDialog(false)}
+        />
+      )}
       <Button variant='contained' onClick={openAutoDialog}>Launch Dialog</Button>
     </Grid>
   );
