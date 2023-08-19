@@ -9,5 +9,5 @@
 - **Low-Code Approach:** AFD uses a modular JSON configuration to generate clean and polished Form Dialogs every time without exhaustive coding.
 - **Simplified UI Creation:** Seamlessly generates Material-UI components based on your JSON configuration, streamlining the UI assembly process.
 - **Automatic CSS Styling:** AFD handles CSS styling automatically, guaranteeing uniformity and responsiveness across your UI design.
-Seamless API Handling: Integration with axios empowers AFD to manage HTTP requests. Configure queries and request types through the JSON setup.
-- **API Integration:** AFD uses axios to send HTTP requests. The query and request type can be configured in the JSON configuration
+Seamless
+- **API Integration:** AFD uses Axios to send HTTP requests. The query and request type get defined from the values in the JSON configuration.
