@@ -7,7 +7,7 @@ import {
   DialogContentText,
   DialogTitle,
   TextFieldProps,
-  //AutocompleteProps,
+  AutocompleteProps,
   Grid,
   TextField,
   Autocomplete
@@ -43,12 +43,13 @@ interface AutocompleteFieldControl {
     id: string;
     required?: boolean;
     label?: string;
-    defaultValue?: string;
-    defaultValues?: string[] | {[key: string]: string};
+    defaultValue?: string | Record<string, string>[];
+    defaultValues?: string[] | Record<string, string>[];
     noOptionsText: string;
-    options: string[];
-  };
+    options: string[] | Record<string, string>[];
+  } & Omit<AutocompleteProps<string, false, false, false, 'div'>, 'renderInput'>;
 }
+
 
 export type Control =
   | TextFieldControl
@@ -97,7 +98,7 @@ export default function AutoDialog({
       }
     });
 
-    setReadyToSubmit(isInvalidArray.length < 1)
+    setReadyToSubmit(isInvalidArray.length < 1);
     setErrors(isInvalidArray);
   };
 
@@ -119,7 +120,6 @@ export default function AutoDialog({
         }
       });
       setFormData(newFormData);
-      checkValidity(newFormData);
     }
   }, [open, data.formComponents]);
 
