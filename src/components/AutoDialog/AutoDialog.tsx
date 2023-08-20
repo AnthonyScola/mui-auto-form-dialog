@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useReducer } from 'react';
 import {
   Button,
   Dialog,
@@ -69,7 +69,7 @@ export interface AutoDialogProps {
 }
 
 export type FormData = {
-  [key: string]: string | string[];
+  [key: string]: null | string | string[];
 };
 
 export default function AutoDialog({
@@ -79,49 +79,32 @@ export default function AutoDialog({
   data,
   onClose
 }: AutoDialogProps) {
-  const [formData, setFormData] = useState<FormData>({});
-  const [errorsArray, setErrors] = useState<string[]>([]);
+  const [formData, setFormData] = useState<FormData>(
+    Object.assign({}, ...data.formComponents.map(control => ({ [control.controlProps.id]: control.controlProps.defaultValue })))
+  );
+  const [errorsArray, setErrors] = useState<string[]>(
+    Object.keys(formData)
+  );
   const [readyToSubmit, setReadyToSubmit] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(false);
 
-  const checkValidity = (formDataToCheck: FormData) => {
-    const required: { [key: string]: boolean | undefined } = {};
-    data.formComponents.forEach((component) => {
-      required[component.controlProps.id] = component.controlProps?.required;
-    });
-
-    const isInvalidArray: string[] = [];
-
-    Object.keys(required).forEach((key) => {
-      if (required[key] && (formDataToCheck[key] ?? '').length <= 0) {
-        isInvalidArray.push(key);
-      }
-    });
-
-    setReadyToSubmit(isInvalidArray.length < 1);
-    setErrors(isInvalidArray);
+  const checkValidity = (Control: Control, value: string | string[] | null) => {
+    if(Control.controlProps.required === false){
+      return;
+    }
+    if(value === null) value = '';
+    const controlId = Control.controlProps.id;
+    if((value.length < 1) && !errorsArray.includes(controlId)){
+      setErrors([...errorsArray, controlId]);
+    }
+    if((value.length > 0) && errorsArray.includes(controlId)){
+      setErrors(errorsArray.filter(item => item !== controlId));
+    }
   };
 
-  useEffect(() => {
-    if (open) {
-      const newFormData: FormData = {};
-      data.formComponents.forEach((control) => {
-        switch (control.controlType) {
-          case 'TextField':
-            newFormData[control.controlProps.id] = (
-              control.controlProps.defaultValue ?? ''
-            ).toString();
-            break;
-          case 'Autocomplete':
-            newFormData[control.controlProps.id] = (
-              control.controlProps.defaultValue ?? ''
-            ).toString();
-            break;
-        }
-      });
-      setFormData(newFormData);
-    }
-  }, [open, data.formComponents]);
+  useEffect(()=>{
+    setReadyToSubmit(errorsArray.length < 1);
+  },[errorsArray]);
 
   const handleClose = () => {
     setFormData({});
@@ -147,8 +130,6 @@ export default function AutoDialog({
     });
   };
 
-  console.log('formData:', formData);
-  console.log('errorsArray.length:', errorsArray.length);
 
   return (
     <Dialog fullWidth open={open} onClose={handleClose}>
@@ -187,10 +168,7 @@ export default function AutoDialog({
                         ...prevData,
                         [control.controlProps.id]: newValue,
                       }));
-                      checkValidity({
-                        ...formData,
-                        [control.controlProps.id]: newValue,
-                      });
+                      checkValidity(control, newValue);
                     }}
                     error={
                       control.controlProps?.required &&
@@ -204,12 +182,13 @@ export default function AutoDialog({
                   sx={{ mt: 1 }}
                   {...control.controlProps}
                   options={control.controlProps.options}
-                  onChange={(event, value) =>
+                  onChange={(event, value) =>{
                     setFormData((data) => ({
                       ...data,
-                      [control.controlProps.id]: value ?? '',
-                    }))
-                  }
+                      [control.controlProps.id]: value,
+                    }));
+                    checkValidity(control, value);
+                  }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
