@@ -64,6 +64,19 @@ export default function App() {
                 },
               },
               {
+                controlType: 'NumberField',
+                size: {
+                  sx: 2,
+                },
+                controlProps: {
+                  id: 'age',
+                  label: 'age',
+                  required: true,
+                  min: 0,
+                  max: 120,
+                },
+              },
+              {
                 controlType: 'TextField',
                 size: {
                   sx: 12,

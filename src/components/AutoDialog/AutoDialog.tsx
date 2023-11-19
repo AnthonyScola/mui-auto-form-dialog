@@ -35,6 +35,19 @@ interface TextFieldControl {
   };
 }
 
+interface NumberFieldControl {
+  controlType: 'NumberField';
+  size: gridSize;
+  hidden?: boolean;
+  controlProps: TextFieldProps & {
+    id: string;
+    required?: boolean;
+    label?: string;
+    min?: number;
+    max?: number;
+  };
+}
+
 interface AutocompleteFieldControl {
   controlType: 'Autocomplete';
   size: gridSize;
@@ -53,6 +66,7 @@ interface AutocompleteFieldControl {
 
 export type Control =
   | TextFieldControl
+  | NumberFieldControl
   | AutocompleteFieldControl
   ;
 
@@ -68,8 +82,10 @@ export interface AutoDialogProps {
   onClose: (callback?: () => void) => void;
 }
 
+export type FormDataTypes = null | number | number[] | string | string[];
+
 export type FormData = {
-  [key: string]: null | string | string[];
+  [key: string]: FormDataTypes;
 };
 
 export default function AutoDialog({
@@ -88,17 +104,24 @@ export default function AutoDialog({
   const [readyToSubmit, setReadyToSubmit] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(false);
 
-  const checkValidity = (Control: Control, value: string | string[] | null) => {
+  const checkValidity = (Control: Control, value: FormDataTypes) => {
     if(Control.controlProps.required === false){
       return;
     }
     if(value === null) value = '';
     const controlId = Control.controlProps.id;
-    if((value.length < 1) && !errorsArray.includes(controlId)){
-      setErrors([...errorsArray, controlId]);
+    if(typeof(value) === 'string'){
+      if((value.length < 1) && !errorsArray.includes(controlId)){
+        setErrors([...errorsArray, controlId]);
+      }
+      if((value.length > 0) && errorsArray.includes(controlId)){
+        setErrors(errorsArray.filter(item => item !== controlId));
+      }
     }
-    if((value.length > 0) && errorsArray.includes(controlId)){
-      setErrors(errorsArray.filter(item => item !== controlId));
+    if(typeof(value) === 'number'){
+      if((value) && errorsArray.includes(controlId)){
+        setErrors(errorsArray.filter(item => item !== controlId));
+      }
     }
   };
 
@@ -177,32 +200,56 @@ export default function AutoDialog({
                     fullWidth
                   />
                 )}
+
+                {control.controlType === 'NumberField' && (
+                  <TextField
+                    {...control.controlProps}
+                    type='number'
+                    inputProps={{
+                      min: control.controlProps?.min,
+                      max: control.controlProps?.max
+                    }}
+                    onChange={(event) => {
+                      const newValue = event.target.value == '' ? '' : Number(event.target.value);
+                      setFormData((prevData) => ({
+                        ...prevData,
+                        [control.controlProps.id]: newValue,
+                      }));
+                      checkValidity(control, newValue);
+                    }}
+                    error={
+                      control.controlProps?.required &&
+                      !formData[control.controlProps.id]
+                    }
+                    fullWidth
+                  />
+                )}
+
                 {control.controlType === 'Autocomplete' && (
                   <Autocomplete
-                  sx={{ mt: 1 }}
-                  {...control.controlProps}
-                  options={control.controlProps.options}
-                  onChange={(event, value) =>{
-                    setFormData((data) => ({
-                      ...data,
-                      [control.controlProps.id]: value,
-                    }));
-                    checkValidity(control, value);
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      required={control.controlProps?.required}
-                      label={control.controlProps.label}
-                      variant="outlined"
-                      error={
-                        control.controlProps?.required &&
-                        !formData[control.controlProps.id]
-                      }
-                      fullWidth
-                    />
-                  )}
-                />
+                    {...control.controlProps}
+                    options={control.controlProps.options}
+                    onChange={(event, value) =>{
+                      setFormData((data) => ({
+                        ...data,
+                        [control.controlProps.id]: value,
+                      }));
+                      checkValidity(control, value);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        required={control.controlProps?.required}
+                        label={control.controlProps.label}
+                        variant="outlined"
+                        error={
+                          control.controlProps?.required &&
+                          !formData[control.controlProps.id]
+                        }
+                        fullWidth
+                      />
+                    )}
+                  />
                 )}
               </Grid>
             ))}
