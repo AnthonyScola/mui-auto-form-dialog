@@ -210,7 +210,7 @@ export default function AutoDialog({
                       max: control.controlProps?.max
                     }}
                     onChange={(event) => {
-                      const newValue = event.target.value == '' ? '' : Number(event.target.value);
+                      const newValue = event.target.value === '' ? '' : Number(event.target.value);
                       setFormData((prevData) => ({
                         ...prevData,
                         [control.controlProps.id]: newValue,
