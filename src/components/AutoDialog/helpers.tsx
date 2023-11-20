@@ -1,4 +1,4 @@
-import { FormDataTypes, Control } from "./typs";
+import { FormDataTypes, Control } from "./interfacesAndTypes";
 
 
 export const validateControl = (Control: Control, value: FormDataTypes, errorsArray: string[], setErrors: React.Dispatch<React.SetStateAction<string[]>>) => {
