@@ -72,8 +72,9 @@ export default function App() {
                   id: 'age',
                   label: 'age',
                   required: true,
-                  min: 0,
+                  min: 1,
                   max: 120,
+                  disalowedValues: [69],
                 },
               },
               {

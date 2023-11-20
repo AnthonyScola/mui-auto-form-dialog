@@ -6,87 +6,14 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  TextFieldProps,
-  AutocompleteProps,
   Grid,
   TextField,
   Autocomplete
 } from '@mui/material';
 import axios from 'axios';
+import { AutoDialogProps, FormData } from './typs';
+import { validateControl } from './helpers';
 
-type GridCols = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-
-interface gridSize {
-  sx?: GridCols;
-  sm?: GridCols;
-  md?: GridCols;
-  lg?: GridCols;
-  xl?: GridCols;
-}
-
-interface TextFieldControl {
-  controlType: 'TextField';
-  size: gridSize;
-  hidden?: boolean;
-  controlProps: TextFieldProps & {
-    id: string;
-    required?: boolean;
-    label?: string;
-  };
-}
-
-interface NumberFieldControl {
-  controlType: 'NumberField';
-  size: gridSize;
-  hidden?: boolean;
-  controlProps: TextFieldProps & {
-    id: string;
-    required?: boolean;
-    label?: string;
-    min?: number;
-    max?: number;
-  };
-}
-
-interface AutocompleteFieldControl {
-  controlType: 'Autocomplete';
-  size: gridSize;
-  hidden?: boolean;
-  controlProps: {
-    id: string;
-    required?: boolean;
-    label?: string;
-    defaultValue?: string | Record<string, string>[];
-    defaultValues?: string[] | Record<string, string>[];
-    noOptionsText: string;
-    options: string[] | Record<string, string>[];
-  } & Omit<AutocompleteProps<string, false, false, false, 'div'>, 'renderInput'>;
-}
-
-
-export type Control =
-  | TextFieldControl
-  | NumberFieldControl
-  | AutocompleteFieldControl
-  ;
-
-export interface AutoDialogProps {
-  open: boolean;
-  title: string;
-  details?: string;
-  data: {
-    action: 'post'|'put'|'patch'|'delete';
-    query: string;
-    formComponents: Control[];
-  };
-  onClose: (callback?: () => void) => void;
-}
-
-export type FormDataTypes = null | number | number[] | string | string[];
-
-export type FormData = {
-  [key: string]: FormDataTypes;
-};
 
 export default function AutoDialog({
   open,
@@ -103,27 +30,6 @@ export default function AutoDialog({
   );
   const [readyToSubmit, setReadyToSubmit] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(false);
-
-  const checkValidity = (Control: Control, value: FormDataTypes) => {
-    if(Control.controlProps.required === false){
-      return;
-    }
-    if(value === null) value = '';
-    const controlId = Control.controlProps.id;
-    if(typeof(value) === 'string'){
-      if((value.length < 1) && !errorsArray.includes(controlId)){
-        setErrors([...errorsArray, controlId]);
-      }
-      if((value.length > 0) && errorsArray.includes(controlId)){
-        setErrors(errorsArray.filter(item => item !== controlId));
-      }
-    }
-    if(typeof(value) === 'number'){
-      if((value) && errorsArray.includes(controlId)){
-        setErrors(errorsArray.filter(item => item !== controlId));
-      }
-    }
-  };
 
   useEffect(()=>{
     setReadyToSubmit(errorsArray.length < 1);
@@ -191,7 +97,7 @@ export default function AutoDialog({
                         ...prevData,
                         [control.controlProps.id]: newValue,
                       }));
-                      checkValidity(control, newValue);
+                      validateControl(control, newValue, errorsArray, setErrors);
                     }}
                     error={
                       control.controlProps?.required &&
@@ -215,7 +121,7 @@ export default function AutoDialog({
                         ...prevData,
                         [control.controlProps.id]: newValue,
                       }));
-                      checkValidity(control, newValue);
+                      validateControl(control, newValue, errorsArray, setErrors);
                     }}
                     error={
                       control.controlProps?.required &&
@@ -234,7 +140,7 @@ export default function AutoDialog({
                         ...data,
                         [control.controlProps.id]: value,
                       }));
-                      checkValidity(control, value);
+                      validateControl(control, value, errorsArray, setErrors);
                     }}
                     renderInput={(params) => (
                       <TextField
