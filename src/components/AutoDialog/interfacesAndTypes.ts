@@ -13,6 +13,7 @@ interface gridSize {
   xl?: GridCols;
 }
 
+
 interface TextFieldControl {
   controlType: 'TextField';
   size: gridSize;
@@ -60,15 +61,17 @@ export type Control =
   | AutocompleteFieldControl
   ;
 
+export interface AutoDialogDataProps {
+  action: "post"|"put"|"patch"|"delete";
+  query: string;
+  formComponents: Control[];
+}
+
 export interface AutoDialogProps {
   open: boolean;
   title: string;
   details?: string;
-  data: {
-    action: 'post'|'put'|'patch'|'delete';
-    query: string;
-    formComponents: Control[];
-  };
+  data: AutoDialogDataProps;
   onClose: (callback?: () => void) => void;
 }
 

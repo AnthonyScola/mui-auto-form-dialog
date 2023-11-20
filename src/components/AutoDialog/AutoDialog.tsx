@@ -11,7 +11,7 @@ import {
   Autocomplete
 } from '@mui/material';
 import axios from 'axios';
-import { AutoDialogProps, FormData } from './typs';
+import { AutoDialogProps, FormData } from './interfacesAndTypes';
 import { validateControl } from './helpers';
 
 
