@@ -46,3 +46,32 @@ export const validateControl = (Control: Control, value: FormDataTypes, errorsAr
     }
   }
 };
+
+
+// {
+//   controlType: 'NumberField',
+//   size: {
+//     sx: 2,
+//   },
+//   controlProps: {
+//     id: 'age',
+//     label: 'age',
+//     required: true,
+//     min: 1,
+//     max: 120,
+//     disalowedValues: [69],
+//     helperText: "Enter your age in years",
+//     errorText: "Please enter a valid age",
+//     disalowedValuesText: "You may not enter {{disalowedValues}} as your age",
+//   },
+// },
+
+export function getHelperText(control: Control, value: FormDataTypes) {
+  console.log(control.controlProps);
+  if (control.controlProps.errorText) {
+    return control.controlProps.errorText;
+  }
+  if (control.controlProps.helperText) {
+    return control.controlProps.helperText;
+  }
+}

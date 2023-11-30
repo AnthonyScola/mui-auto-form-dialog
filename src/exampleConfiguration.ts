@@ -52,6 +52,8 @@ export const exampleConfiguration: AutoDialogDataProps = {
         min: 1,
         max: 120,
         disalowedValues: [69],
+        helperText: "Enter your age in years",
+        errorText: "Invalid age",
       },
     },
     {

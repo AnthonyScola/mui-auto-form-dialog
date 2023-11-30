@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { AutoDialogProps, FormData } from './interfacesAndTypes';
-import { validateControl } from './helpers';
+import { validateControl, getHelperText } from './helpers';
 
 
 export default function AutoDialog({
@@ -127,6 +127,7 @@ export default function AutoDialog({
                       control.controlProps?.required &&
                       !formData[control.controlProps.id]
                     }
+                    helperText={getHelperText(control, formData[control.controlProps.id])}
                     fullWidth
                   />
                 )}

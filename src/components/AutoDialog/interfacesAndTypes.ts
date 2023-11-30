@@ -22,6 +22,10 @@ interface TextFieldControl {
     id: string;
     required?: boolean;
     label?: string;
+    disalowedValues?: string[];
+    helperText?: string;
+    errorText?: string;
+    disalowedValuesText?: string;
   };
 }
 
@@ -36,6 +40,8 @@ interface NumberFieldControl {
     min?: number;
     max?: number;
     disalowedValues?: number[];
+    helperText?: string;
+    errorText?: string;
   };
 }
 
@@ -51,6 +57,8 @@ export interface AutocompleteFieldControl {
     defaultValues?: string[] | Record<string, string>[];
     noOptionsText: string;
     options: string[] | Record<string, string>[];
+    helperText?: string;
+    errorText?: string;
   } & Omit<AutocompleteProps<string, false, false, false, 'div'>, 'renderInput'>;
 }
 
