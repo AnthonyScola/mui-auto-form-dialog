@@ -68,10 +68,19 @@ export const validateControl = (Control: Control, value: FormDataTypes, errorsAr
 
 export function getHelperText(control: Control, value: FormDataTypes) {
   console.log(control.controlProps);
-  if (control.controlProps.errorText) {
-    return control.controlProps.errorText;
+  if (control.controlType === "NumberField" && typeof value === "number") {
+    if (control.controlProps.disalowedValueshelperText && control.controlProps.disalowedValues && control.controlProps.disalowedValues.includes(value)) {
+      return control.controlProps.disalowedValueshelperText;
+    }
+    if (control.controlProps.errorText && control.controlProps.min && value < control.controlProps.min) {
+      return control.controlProps.errorText;
+    }
+    if (control.controlProps.errorText && control.controlProps.max && value > control.controlProps.max) {
+      return control.controlProps.errorText;
+    }
   }
   if (control.controlProps.helperText) {
     return control.controlProps.helperText;
   }
+  return "";
 }

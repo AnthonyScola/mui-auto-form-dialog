@@ -23,9 +23,9 @@ interface TextFieldControl {
     required?: boolean;
     label?: string;
     disalowedValues?: string[];
+    disalowedValueshelperText?: string;
     helperText?: string;
     errorText?: string;
-    disalowedValuesText?: string;
   };
 }
 
@@ -40,6 +40,7 @@ interface NumberFieldControl {
     min?: number;
     max?: number;
     disalowedValues?: number[];
+    disalowedValueshelperText?: string;
     helperText?: string;
     errorText?: string;
   };
