@@ -43,7 +43,7 @@ export const exampleConfiguration: AutoDialogDataProps = {
     {
       controlType: 'NumberField',
       size: {
-        sx: 2,
+        sx: 3,
       },
       controlProps: {
         id: 'age',
@@ -51,8 +51,8 @@ export const exampleConfiguration: AutoDialogDataProps = {
         required: true,
         min: 1,
         max: 120,
-        disalowedValues: [69],
-        helperText: "Enter your age in years",
+        disallowedValues: [69],
+        helperText: "Enter your age",
         errorText: "Invalid age",
       },
     },

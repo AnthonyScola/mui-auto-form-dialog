@@ -17,9 +17,9 @@ export const validateControl = (Control: Control, value: FormDataTypes, errorsAr
     }
   }
 
-  if(typeof(value) === 'number'){
-    if('disalowedValues' in Control.controlProps && Control.controlProps.disalowedValues !== undefined){
-      if(Control.controlProps.disalowedValues.includes(value) && !errorsArray.includes(controlId)){
+  if(typeof(value) === 'number' && Control.controlType === 'NumberField'){
+    if('disallowedValues' in Control.controlProps && Control.controlProps.disallowedValues !== undefined){
+      if(Control.controlProps.disallowedValues.includes(value) && !errorsArray.includes(controlId)){
         setErrors([...errorsArray, controlId]);
         return;
       }
@@ -59,28 +59,33 @@ export const validateControl = (Control: Control, value: FormDataTypes, errorsAr
 //     required: true,
 //     min: 1,
 //     max: 120,
-//     disalowedValues: [69],
+//     disallowedValues: [69],
 //     helperText: "Enter your age in years",
-//     errorText: "Please enter a valid age",
-//     disalowedValuesText: "You may not enter {{disalowedValues}} as your age",
+//     errorText: "Please enter a valid age between {{min}} and {{max}}",
+//     disallowedValuesText: "You may not enter {{disallowedValues}} as your age",
 //   },
 // },
 
 export function getHelperText(control: Control, value: FormDataTypes) {
   console.log(control.controlProps);
+  let result = "";
   if (control.controlType === "NumberField" && typeof value === "number") {
-    if (control.controlProps.disalowedValueshelperText && control.controlProps.disalowedValues && control.controlProps.disalowedValues.includes(value)) {
-      return control.controlProps.disalowedValueshelperText;
+    if (control.controlProps.disallowedValueshelperText && control.controlProps.disallowedValues && control.controlProps.disallowedValues.includes(value)) {
+      result = control.controlProps.disallowedValueshelperText;
     }
     if (control.controlProps.errorText && control.controlProps.min && value < control.controlProps.min) {
-      return control.controlProps.errorText;
+      result = control.controlProps.errorText;
     }
     if (control.controlProps.errorText && control.controlProps.max && value > control.controlProps.max) {
-      return control.controlProps.errorText;
+      result = control.controlProps.errorText;
     }
   }
   if (control.controlProps.helperText) {
-    return control.controlProps.helperText;
+    result = control.controlProps.helperText;
   }
-  return "";
+  for (let key in control.controlProps) {
+    let placeholder = `{{${key}}}`;
+    result = result.replace(new RegExp(placeholder, 'g'), String(control.controlProps[key as keyof typeof control.controlProps]));
+  }
+  return result;
 }
